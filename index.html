@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurador de Bot — Reclutamiento</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F4F0;--surface:#FFFFFF;--surface2:#EFEDE8;
+  --border:#E0DDD6;--accent:#1A5CFF;--accent-l:#EEF2FF;--accent-d:#0038CC;
+  --green:#0D7A4E;--green-bg:#EDFAF4;
+  --red:#C0392B;--red-bg:#FDF0EE;
+  --text:#18170F;--text2:#52504A;--text3:#96948E;
+  --r:10px;--rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600}
+.logo-icon{width:30px;height:30px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.hdr-tag{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:4px 10px;border-radius:20px}
+.app{display:grid;grid-template-columns:210px 1fr 290px;gap:1.5rem;max-width:1180px;width:100%;margin:0 auto;padding:1.75rem 1.5rem;align-items:start;flex:1}
+.sidebar{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;position:sticky;top:74px}
+.sb-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.step{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--r);margin-bottom:2px}
+.step.done{background:var(--green-bg)}
+.step.active{background:var(--accent-l);border:1px solid #C5D4FF}
+.step.pending{opacity:.38}
+.step-n{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--border);color:var(--text3);background:var(--bg)}
+.step.done .step-n{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.step.active .step-n{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-l{font-size:12.5px;color:var(--text2);line-height:1.3}
+.step.active .step-l{color:var(--accent-d);font-weight:500}
+.step.done .step-l{color:var(--green)}
+.prog-wrap{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px;font-family:'DM Mono',monospace}
+.prog-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.chat-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);display:flex;flex-direction:column;min-height:580px;overflow:hidden}
+.chat-hdr{padding:.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.bot-av{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.bot-name{font-size:14px;font-weight:600}
+.bot-sub{font-size:11px;color:var(--text3)}
+.online{width:7px;height:7px;background:#22C55E;border-radius:50%;margin-left:auto;box-shadow:0 0 0 2px #dcfce7}
+.chat-msgs{flex:1;padding:1.25rem;overflow-y:auto;display:flex;flex-direction:column;gap:12px;max-height:420px}
+.mrow{display:flex;align-items:flex-end;gap:8px}
+.mrow.user{flex-direction:row-reverse}
+.mav{width:28px;height:28px;border-radius:8px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mav.bot{background:var(--accent);color:#fff}
+.mav.user{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.bub{max-width:80%;padding:9px 13px;font-size:13.5px;line-height:1.58;border-radius:4px 14px 14px 14px;background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.bub.user{border-radius:14px 4px 14px 14px;background:var(--accent);color:#fff;border-color:var(--accent)}
+.bub .hint{display:block;font-size:11px;color:var(--text3);margin-top:4px;font-family:'DM Mono',monospace}
+.tdots{display:flex;gap:4px;padding:11px 14px;align-items:center}
+.dot{width:6px;height:6px;background:var(--text3);border-radius:50%;animation:tdot .9s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.opts{display:flex;flex-wrap:wrap;gap:6px;padding:6px 1.25rem 10px}
+.opt{font-size:12.5px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--accent);color:var(--accent);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .13s}
+.opt:hover{background:var(--accent);color:#fff}
+.inp-row{display:flex;gap:8px;padding:.875rem 1.25rem;border-top:1px solid var(--border)}
+.inp-row input{flex:1;font-family:'DM Sans',sans-serif;font-size:13.5px;border:1.5px solid var(--border);border-radius:var(--r);padding:9px 13px;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+.inp-row input:focus{border-color:var(--accent)}
+.inp-row input:disabled{opacity:.45;cursor:not-allowed}
+.sbtn{width:40px;height:40px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .13s;flex-shrink:0}
+.sbtn:hover{background:var(--accent-d)}
+.sbtn:disabled{opacity:.35;cursor:not-allowed}
+.rp{display:flex;flex-direction:column;gap:1rem;position:sticky;top:74px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem}
+.card-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+.srow{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;border-bottom:1px solid var(--border);gap:8px}
+.srow:last-child{border:none}
+.sk{font-size:11px;color:var(--text3);flex-shrink:0;padding-top:1px}
+.sv{font-size:12px;font-weight:500;color:var(--text);text-align:right;word-break:break-word}
+.tag-d{font-size:10px;padding:1px 6px;border-radius:6px;background:var(--red-bg);color:var(--red);font-weight:600;font-family:'DM Mono',monospace}
+.tag-ok{font-size:10px;padding:1px 6px;border-radius:6px;background:var(--green-bg);color:var(--green);font-weight:600;font-family:'DM Mono',monospace}
+.empty{font-size:12px;color:var(--text3);text-align:center;padding:1.5rem 0;font-family:'DM Mono',monospace}
+.send-btn{width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--green);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.send-btn:hover:not(:disabled){opacity:.86}
+.send-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* Pantalla de éxito */
+.success-screen{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:2rem;text-align:center;gap:1rem}
+.success-screen.show{display:flex}
+.success-icon{width:64px;height:64px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid var(--green)}
+.success-title{font-size:20px;font-weight:600;color:var(--text)}
+.success-sub{font-size:14px;color:var(--text2);line-height:1.6;max-width:300px}
+
+@media(max-width:860px){.app{grid-template-columns:1fr}.sidebar,.rp{position:static}}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">
+    <span class="logo-icon">🤖</span>
+    Configurador de Bot
+  </span>
+  <span class="hdr-tag">Reclutamiento · v1.0</span>
+</header>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-label">Pasos</div>
+    <div id="steps-nav"></div>
+    <div class="prog-wrap">
+      <div class="prog-labels"><span>Progreso</span><span id="pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="chat-panel">
+    <div class="chat-hdr">
+      <div class="bot-av">🤖</div>
+      <div>
+        <div class="bot-name">Asistente de configuración</div>
+        <div class="bot-sub">Te guía paso a paso · menos de 5 min</div>
+      </div>
+      <div class="online"></div>
+    </div>
+    <div class="chat-msgs" id="chat"></div>
+    <div class="success-screen" id="success">
+      <div class="success-icon">✅</div>
+      <div class="success-title">¡Información enviada!</div>
+      <div class="success-sub">Tu equipo de configuración recibirá los datos y en breve se pondrá en contacto contigo.</div>
+    </div>
+    <div class="opts" id="opts"></div>
+    <div class="inp-row" id="inp-row">
+      <input id="inp" placeholder="Escribe tu respuesta..." onkeydown="if(event.key==='Enter')send()" disabled />
+      <button class="sbtn" id="sbtn" onclick="send()" disabled aria-label="Enviar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="rp">
+    <div class="card">
+      <div class="card-title">📋 Resumen</div>
+      <div id="sum-rows"><div class="empty">Tus respuestas aparecerán aquí</div></div>
+    </div>
+    <button class="send-btn" id="send-btn" disabled onclick="enviar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      Enviar configuración
+    </button>
+  </div>
+</div>
+
+<script>
+// ── FORMSPREE — reemplaza con tu form ID después de registrarte ──
+const FORMSPREE_URL = 'https://formspree.io/f/mykoogab';
+// ────────────────────────────────────────────────────────────────
+
+const STEPS=[
+  {l:'Puesto y actividades'},
+  {l:'Localidad'},
+  {l:'Compensación'},
+  {l:'Disponibilidad'},
+  {l:'Escolaridad'},
+  {l:'Experiencia'},
+  {l:'Lógica de descarte'},
+  {l:'Listo para enviar'},
+];
+
+const FLOW=[
+  {s:0,k:'puesto',t:'text',q:'¡Hola! Vamos a configurar la conversación del bot en menos de 5 minutos.\n\n¿Cuál es el nombre del puesto?',h:''},
+  {s:0,k:'actividades',t:'text',q:'¿Cuáles son las 3 o 4 actividades principales del puesto?\n\nSepáralas por coma.',h:''},
+  {s:1,k:'planta',t:'text',q:'¿En qué planta o ciudad estará basado el puesto?',h:''},
+  {s:1,k:'marcas',t:'opt',q:'¿Quieres mencionar productos o marcas de la planta para motivar al candidato?',o:['Sí, quiero mencionarlos','No, omitir este dato']},
+  {s:1,k:'marcas_desc',t:'text',q:'¿Cuáles son los productos o marcas?',h:'',dep:{k:'marcas',v:'Sí, quiero mencionarlos'}},
+  {s:2,k:'sueldo',t:'text',q:'¿Cuál es el sueldo para este puesto?',h:''},
+  {s:2,k:'periodicidad',t:'opt',q:'¿Con qué periodicidad se paga?',o:['Semanal','Quincenal','Mensual']},
+  {s:2,k:'bono',t:'opt',q:'¿El puesto incluye bono de permanencia?',o:['Sí, incluir bono','No incluir bono']},
+  {s:2,k:'prestaciones',t:'text',q:'¿Qué prestaciones adicionales ofrecen para este puesto?',h:''},
+  {s:3,k:'turno',t:'opt',q:'¿Cómo es el esquema de turnos?',o:['Turno fijo matutino','Turno fijo vespertino','Turnos rotativos','Turno nocturno','Fin de semana']},
+  {s:3,k:'horarios',t:'text',q:'Escribe los horarios, uno por línea.\n\nej: 1er Turno: 6am–2pm\n2do Turno: 2pm–10pm',h:''},
+  {s:4,k:'escolaridad',t:'opt',q:'¿Cuál es la escolaridad mínima requerida?',o:['Secundaria','Preparatoria / Bachillerato','Carrera técnica','Licenciatura']},
+  {s:4,k:'carrera_req',t:'opt',q:'¿El puesto requiere carrera o especialidad específica?',o:['Sí, hay carreras específicas','No, cualquier carrera aplica']},
+  {s:4,k:'carreras',t:'text',q:'¿Cuáles carreras o especialidades aceptadas?\n\nSepáralas por coma.',h:'',dep:{k:'carrera_req',v:'Sí, hay carreras específicas'}},
+  {s:4,k:'estatus_est',t:'opt',q:'¿Qué estatus de estudios acepta el puesto?',o:['Solo estudios terminados','Terminado o trunco','Terminado, trunco o en curso']},
+  {s:5,k:'exp_req',t:'opt',q:'¿Se requiere experiencia previa para este puesto?',o:['Sí se requiere','No, se acepta sin experiencia']},
+  {s:5,k:'exp_area',t:'text',q:'¿En qué áreas debe tener experiencia el candidato?',h:'',dep:{k:'exp_req',v:'Sí se requiere'}},
+  {s:5,k:'exp_tiempo',t:'opt',q:'¿Cuánto tiempo mínimo de experiencia?',o:['Menos de 1 año','1 a 2 años','Más de 2 años','Más de 5 años'],dep:{k:'exp_req',v:'Sí se requiere'}},
+  {s:6,k:'desc_turno',t:'opt',q:'Si el candidato NO tiene disponibilidad de turno, ¿qué hacemos?',o:['Descartarlo automáticamente','Dejarlo pasar (revisar manualmente)']},
+  {s:6,k:'desc_esc',t:'opt',q:'Si el candidato NO cumple la escolaridad mínima, ¿qué hacemos?',o:['Descartarlo automáticamente','Dejarlo pasar (revisar manualmente)']},
+  {s:6,k:'desc_carrera',t:'opt',q:'Si el candidato NO tiene las carreras aceptadas, ¿qué hacemos?',o:['Descartarlo automáticamente','Dejarlo pasar (revisar manualmente)'],dep:{k:'carrera_req',v:'Sí, hay carreras específicas'}},
+  {s:6,k:'desc_exp',t:'opt',q:'Si el candidato NO tiene la experiencia requerida, ¿qué hacemos?',o:['Descartarlo automáticamente','Dejarlo pasar (revisar manualmente)'],dep:{k:'exp_req',v:'Sí se requiere'}},
+  {s:6,k:'entrevistador',t:'text',q:'¿Cuál es el nombre del reclutador que recibirá al candidato?',h:''},
+  {s:6,k:'direccion',t:'text',q:'¿Cuál es la dirección de la planta para la entrevista?',h:''},
+  {s:6,k:'contacto_nombre',t:'text',q:'Por último, ¿cuál es tu nombre? (para identificar quién envía la configuración)',h:''},
+  {s:6,k:'contacto_empresa',t:'text',q:'¿Y el nombre de tu empresa o planta?',h:''},
+];
+
+const D={};
+let idx=0,cs=0,busy=false;
+const DISC=['desc_turno','desc_esc','desc_carrera','desc_exp'];
+const LABELS={puesto:'Puesto',actividades:'Actividades',planta:'Planta',marcas_desc:'Marcas',sueldo:'Sueldo',periodicidad:'Periodicidad',bono:'Bono',prestaciones:'Prestaciones adicionales',turno:'Turno',horarios:'Horarios',escolaridad:'Escolaridad',carreras:'Carreras',estatus_est:'Estatus estudios',exp_req:'Experiencia',exp_area:'Áreas exp.',exp_tiempo:'Tiempo exp.',desc_turno:'Desc. turno',desc_esc:'Desc. escolaridad',desc_carrera:'Desc. carrera',desc_exp:'Desc. experiencia',entrevistador:'Reclutador',direccion:'Dirección',contacto_nombre:'Contacto',contacto_empresa:'Empresa'};
+
+function rSteps(){
+  const pct=Math.round((cs/STEPS.length)*100);
+  document.getElementById('pct').textContent=pct+'%';
+  document.getElementById('pfill').style.width=pct+'%';
+  document.getElementById('steps-nav').innerHTML=STEPS.map((s,i)=>{
+    const c=i<cs?'done':i===cs?'active':'pending';
+    const n=i<cs?'✓':(i+1);
+    return `<div class="step ${c}"><div class="step-n">${n}</div><div class="step-l">${s.l}</div></div>`;
+  }).join('');
+}
+
+function addMsg(txt,who,thinking=false){
+  const c=document.getElementById('chat');
+  const r=document.createElement('div');r.className=`mrow ${who}`;
+  const a=document.createElement('div');a.className=`mav ${who}`;a.textContent=who==='bot'?'IA':'Tú';
+  const b=document.createElement('div');b.className=`bub ${who}`;
+  if(thinking) b.innerHTML='<div class="tdots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  else b.innerHTML=txt.replace(/\n/g,'<br>');
+  r.appendChild(a);r.appendChild(b);c.appendChild(r);
+  c.scrollTop=c.scrollHeight;return b;
+}
+
+function setInp(on){
+  document.getElementById('inp').disabled=!on;
+  document.getElementById('sbtn').disabled=!on;
+  if(on) setTimeout(()=>document.getElementById('inp').focus(),80);
+}
+
+function showOpts(o){
+  document.getElementById('opts').innerHTML=o.map(x=>`<button class="opt" onclick="pick('${x.replace(/'/g,"&#39;")}')">${x}</button>`).join('');
+  setInp(false);
+}
+function clrOpts(){document.getElementById('opts').innerHTML='';}
+
+function updSum(){
+  const entries=Object.entries(D).filter(([k])=>LABELS[k]);
+  if(!entries.length){document.getElementById('sum-rows').innerHTML='<div class="empty">Tus respuestas aparecerán aquí</div>';return;}
+  document.getElementById('sum-rows').innerHTML=entries.map(([k,v])=>{
+    let sv=v;
+    if(DISC.includes(k)) sv=v==='Descartarlo automáticamente'?'<span class="tag-d">Descarta</span>':'<span class="tag-ok">Avanza</span>';
+    return `<div class="srow"><span class="sk">${LABELS[k]}</span><span class="sv">${sv}</span></div>`;
+  }).join('');
+}
+
+function pick(v){
+  clrOpts();addMsg(v,'user');
+  D[FLOW[idx].k]=v;updSum();idx++;
+  setTimeout(next,550);
+}
+
+function send(){
+  const v=document.getElementById('inp').value.trim();
+  if(!v||busy)return;
+  document.getElementById('inp').value='';
+  addMsg(v,'user');
+  D[FLOW[idx].k]=v;updSum();idx++;
+  setTimeout(next,550);
+}
+
+function next(){
+  if(idx>=FLOW.length){finish();return;}
+  const q=FLOW[idx];
+  if(q.dep&&D[q.dep.k]!==q.dep.v){idx++;next();return;}
+  cs=q.s;rSteps();busy=true;setInp(false);
+  const b=addMsg('','bot',true);
+  setTimeout(()=>{
+    let h=q.q.replace(/\n/g,'<br>');
+    if(q.h) h+=`<span class="hint">${q.h}</span>`;
+    b.innerHTML=h;busy=false;
+    if(q.t==='opt') showOpts(q.o);
+    else setInp(true);
+    document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight;
+  },780);
+}
+
+function finish(){
+  cs=7;rSteps();clrOpts();
+  addMsg('¡Perfecto! Ya tengo toda la información. Revisa el resumen y presiona "Enviar configuración" cuando estés listo.','bot');
+  document.getElementById('send-btn').disabled=false;
+}
+
+async function enviar(){
+  document.getElementById('send-btn').disabled=true;
+  document.getElementById('send-btn').textContent='Enviando...';
+
+  // Construir el cuerpo del correo con toda la info
+  const resumen = Object.entries(LABELS)
+    .filter(([k])=>D[k])
+    .map(([k,l])=>`${l}: ${D[k]}`)
+    .join('\n');
+
+  const payload = {
+    ...D,
+    _subject: `Nueva configuración de bot — ${D.puesto||'Sin nombre'} | ${D.contacto_empresa||''}`,
+    _replyto: 'noreply@configurador-bot.com',
+    resumen_completo: resumen,
+  };
+
+  try {
+    const res = await fetch(FORMSPREE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if(res.ok){
+      // Ocultar chat, mostrar pantalla de éxito
+      document.getElementById('chat').style.display='none';
+      document.getElementById('opts').style.display='none';
+      document.getElementById('inp-row').style.display='none';
+      document.getElementById('success').classList.add('show');
+      cs=8;rSteps();
+    } else {
+      throw new Error('Error al enviar');
+    }
+  } catch(err){
+    document.getElementById('send-btn').disabled=false;
+    document.getElementById('send-btn').textContent='Reintentar envío';
+    addMsg('Hubo un error al enviar. Por favor intenta de nuevo.','bot');
+  }
+}
+
+rSteps();
+setTimeout(()=>{
+  const b=addMsg('','bot',true);
+  setTimeout(()=>{
+    b.innerHTML='¡Hola! Vamos a configurar la conversación del bot en menos de 5 minutos.<br><br>¿Cuál es el nombre del puesto?<span class="hint">ej. Técnico Electromecánico, Operador de Producción</span>';
+    setInp(true);idx=1;
+  },900);
+},500);
+</script>
+</body>
+</html>
